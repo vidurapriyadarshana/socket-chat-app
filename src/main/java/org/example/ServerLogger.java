@@ -8,7 +8,7 @@ public class ServerLogger {
     private static final Logger logger = Logger.getLogger("ChatServer");
 
     private ServerLogger() {
-        // utility class — no instances
+       
     }
 
     public static void serverStarted(int port) {
@@ -19,12 +19,24 @@ public class ServerLogger {
         logger.info("SERVER STOPPED | Time: " + LocalDateTime.now());
     }
 
+    public static void newClientConnected() {
+        logger.info("NEW CLIENT CONNECTED | Time: " + LocalDateTime.now());
+    }
+
     public static void userConnected(String username, String ip) {
         logger.info("USER CONNECTED | Username: " + username + " | IP: " + ip + " | Time: " + LocalDateTime.now());
     }
 
     public static void userDisconnected(String username) {
         logger.info("USER DISCONNECTED | Username: " + username + " | Time: " + LocalDateTime.now());
+    }
+
+    public static void userDisconnectedUnexpectedly(String username) {
+        logger.warning("USER DISCONNECTED UNEXPECTEDLY | Username: " + username + " | Time: " + LocalDateTime.now());
+    }
+
+    public static void messageBroadcast(String message) {
+        logger.info("BROADCAST | Message: " + message + " | Time: " + LocalDateTime.now());
     }
 
     public static void error(String message) {
