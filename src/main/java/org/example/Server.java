@@ -1,18 +1,35 @@
 package org.example;
 
+import java.net.ServerSocket;
+import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
 
 public class Server {
 
+    private static final int PORT = 5000;
     public static List<ClientHandler> clients = new ArrayList<>();
 
     public static void main(String[] args) {
-        int port = 3000;
-        System.out.println("Server Started On: " + port);
+        startServer();
+    }
 
+    private static void startServer(){
+        try(ServerSocket serverSocket = new ServerSocket(PORT)){
+            ServerLogger.serverStarted(PORT);
 
+            while(true){
+                Socket socket = serverSocket.accept();
+                ClientHandler handler = new ClientHandler(socket);
+                clients.add(handler);
+                handler.start();
+            }
 
+        } catch (Exception e) {
+            ServerLogger.error(e.getMessage());
+        } finally {
+            ServerLogger.serverStopped();
+        }
     }
 
     public static void broadcast(Message message){
