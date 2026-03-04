@@ -11,7 +11,7 @@ public class Server {
     public static final List<ClientHandler> clients = new CopyOnWriteArrayList<>();
 
     private Server() {
-       
+
     }
 
     public static void main(String[] args) {
