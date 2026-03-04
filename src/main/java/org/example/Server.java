@@ -2,23 +2,27 @@ package org.example;
 
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 public class Server {
 
     private static final int PORT = 5000;
-    public static List<ClientHandler> clients = new ArrayList<>();
+    public static final List<ClientHandler> clients = new CopyOnWriteArrayList<>();
+
+    private Server() {
+        // utility class — no instances
+    }
 
     public static void main(String[] args) {
         startServer();
     }
 
-    private static void startServer(){
-        try(ServerSocket serverSocket = new ServerSocket(PORT)){
+    private static void startServer() {
+        try (ServerSocket serverSocket = new ServerSocket(PORT)) {
             ServerLogger.serverStarted(PORT);
 
-            while(true){
+            while (true) {
                 Socket socket = serverSocket.accept();
                 ClientHandler handler = new ClientHandler(socket);
                 clients.add(handler);
@@ -32,8 +36,8 @@ public class Server {
         }
     }
 
-    public static void broadcast(Message message){
-        for(ClientHandler client : clients){
+    public static void broadcast(Message message) {
+        for (ClientHandler client : clients) {
             client.sendMessage(message);
         }
     }
