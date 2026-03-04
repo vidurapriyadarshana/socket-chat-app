@@ -74,10 +74,6 @@ public class ClientHandler extends Thread {
         }
     }
 
-    public String getUsername() {
-        return username;
-    }
-
     private void close() {
         try {
             socket.close();
