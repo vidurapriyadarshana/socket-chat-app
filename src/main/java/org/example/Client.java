@@ -19,13 +19,11 @@ public class Client {
             String username = scanner.nextLine();
             out.writeUTF(username);
 
-            // Thread to receive messages
             new Thread(() -> {
                 try {
                     while (true) {
                         String message = in.readUTF();
 
-                        // Skip messages that are our own broadcast echo
                         if (message.startsWith(username + ": ")) {
                             continue;
                         }
@@ -37,7 +35,6 @@ public class Client {
                 }
             }).start();
 
-            // Send messages
             while (true) {
                 String message = scanner.nextLine();
                 out.writeUTF(message);
