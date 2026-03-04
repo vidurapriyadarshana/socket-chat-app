@@ -4,52 +4,67 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 
-public class ClientHandler extends Thread{
+public class ClientHandler extends Thread {
 
-    private Socket socket;
+    private final Socket socket;
     private ObjectInputStream inputStream;
     private ObjectOutputStream outputStream;
     private String clientName;
 
-    public ClientHandler(Socket socket){
+    public ClientHandler(Socket socket) {
         this.socket = socket;
     }
 
     @Override
     public void run() {
-        try{
+        try {
             outputStream = new ObjectOutputStream(socket.getOutputStream());
             inputStream = new ObjectInputStream(socket.getInputStream());
 
             clientName = (String) inputStream.readObject();
-            System.out.println(clientName + " Joined The Chat");
+            setName("ClientHandler-" + clientName);
 
-            Server.broadcast(new Message("Server", clientName + " Joined"));
+            ServerLogger.userConnected(clientName, socket.getInetAddress().getHostAddress());
+            Server.broadcast(new Message("Server", clientName + " joined the chat"));
 
-            while(true){
+            while (true) {
                 Message message = (Message) inputStream.readObject();
+
+                if (message.getType() == Message.Type.LOGOUT) {
+                    Server.broadcast(new Message("Server", clientName + " left the chat"));
+                    ServerLogger.userDisconnected(clientName);
+                    break;
+                }
+
                 Server.broadcast(message);
             }
+
         } catch (Exception e) {
-            System.out.println("Client Name: " + clientName);
+            if (clientName != null) {
+                ServerLogger.userDisconnected(clientName);
+                Server.broadcast(new Message("Server", clientName + " lost connection"));
+            } else {
+                ServerLogger.error("Unnamed client disconnected: " + e.getMessage());
+            }
         } finally {
             Server.removeClient(this);
+            close();
         }
     }
 
-    public void sendMessage(Message message){
-        try{
+    public void sendMessage(Message message) {
+        try {
             outputStream.writeObject(message);
         } catch (Exception e) {
-            ServerLogger.error(e.getMessage());
+            ServerLogger.error("Failed to send message to " + clientName + ": " + e.getMessage());
         }
     }
 
-    private void close(){
-        try{
+    private void close() {
+        try {
             socket.close();
-        } catch (Exception ignored) {
-
+        } catch (Exception e) {
+            ServerLogger.error("Failed to close socket for " + clientName + ": " + e.getMessage());
         }
     }
 }
