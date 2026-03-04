@@ -3,12 +3,15 @@ package org.example;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 public class Server {
 
     public static final int PORT = 5000;
     public static final List<ClientHandler> clients = new CopyOnWriteArrayList<>();
+    public static final Map<String, ClientHandler> clientMap = new ConcurrentHashMap<>();
 
     private Server() {
         
@@ -41,7 +44,24 @@ public class Server {
         }
     }
 
+    public static void registerClient(String username, ClientHandler handler) {
+        clientMap.put(username, handler);
+    }
+
     public static void removeClient(ClientHandler client) {
         clients.remove(client);
+        clientMap.values().remove(client);
+    }
+
+    public static void sendPrivate(String fromUsername, String toUsername, String text) {
+        ClientHandler target = clientMap.get(toUsername);
+        if (target == null) {
+            ClientHandler sender = clientMap.get(fromUsername);
+            if (sender != null) {
+                sender.sendMessage("[Server]: User '" + toUsername + "' not found.");
+            }
+            return;
+        }
+        target.sendMessage("[PM from " + fromUsername + "]: " + text);
     }
 }
