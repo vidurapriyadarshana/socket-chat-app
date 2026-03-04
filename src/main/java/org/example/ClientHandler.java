@@ -24,8 +24,12 @@ public class ClientHandler extends Thread{
             clientName = (String) inputStream.readObject();
             System.out.println(clientName + " Joined The Chat");
 
+            Server.broadcast(new Message("Server", clientName + " Joined"));
 
-
+            while(true){
+                Message message = (Message) inputStream.readObject();
+                Server.broadcast(message);
+            }
         } catch (Exception e) {
             System.out.println("Client Name: " + clientName);
         } finally {
@@ -37,7 +41,15 @@ public class ClientHandler extends Thread{
         try{
             outputStream.writeObject(message);
         } catch (Exception e) {
-            e.printStackTrace();
+            ServerLogger.error(e.getMessage());
+        }
+    }
+
+    private void close(){
+        try{
+            socket.close();
+        } catch (Exception ignored) {
+
         }
     }
 }
