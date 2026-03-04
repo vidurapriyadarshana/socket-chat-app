@@ -36,7 +36,6 @@ public class Server {
     }
 
     public static void broadcast(String message) {
-        ServerLogger.messageBroadcast(message);
         for (ClientHandler client : clients) {
             client.sendMessage(message);
         }

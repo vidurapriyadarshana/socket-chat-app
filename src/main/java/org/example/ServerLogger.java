@@ -35,10 +35,6 @@ public class ServerLogger {
         logger.warning("USER DISCONNECTED UNEXPECTEDLY | Username: " + username + " | Time: " + LocalDateTime.now());
     }
 
-    public static void messageBroadcast(String message) {
-        logger.info("BROADCAST | Message: " + message + " | Time: " + LocalDateTime.now());
-    }
-
     public static void error(String message) {
         logger.severe("ERROR: " + message);
     }
